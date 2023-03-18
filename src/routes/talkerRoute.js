@@ -82,6 +82,21 @@ const talkValid = (req, res, next) => {
   }
 };
 
+const rateValid = (req, res, next) => {
+  const { rate } = req.body;
+
+  if (rate === undefined) {
+    return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
+  }
+  if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
+    return res
+      .status(400)
+      .json({ message: 'O campo "rate" deve ser um número inteiro entre 1 e 5' });
+  }
+
+  next();
+};
+
 router.get('/', async (_req, res) => res.status(200).json(await readTalkers()));
 
 router.get('/search', tokenValid, async (req, res) => {
@@ -145,6 +160,21 @@ router.delete('/:id', tokenValid, async (req, res) => {
   const newTalkers = talkers.filter((tal) => tal.id !== +id);
 
   await writeTalker(newTalkers);
+
+  return res.status(204).json();
+});
+
+router.patch('/rate/:id', tokenValid, rateValid, async (req, res) => {
+  const { id } = req.params;
+  const { rate } = req.body;
+
+  const talkers = await readTalkers();
+
+  const talker = talkers.find((tal) => tal.id === +id);
+
+  talker.talk.rate = rate;
+
+  await writeTalker(talkers);
 
   return res.status(204).json();
 });
