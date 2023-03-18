@@ -8,4 +8,12 @@ const readTalkers = async () => {
   }
 };
 
-module.exports = { readTalkers };
+const writeTalker = async (talkers) => {
+  try {
+    return fs.writeFile('./src/talker.json', JSON.stringify(talkers));
+  } catch (error) {
+    return error.message;
+  }
+};
+
+module.exports = { readTalkers, writeTalker };
