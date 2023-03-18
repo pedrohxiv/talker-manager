@@ -109,13 +109,15 @@ router.post('/', tokenValid, nameValid, ageValid, talkValid, async (req, res) =>
 
 router.put('/:id', tokenValid, nameValid, ageValid, talkValid, async (req, res) => {
   const { id } = req.params;
-  const { name, age, talk } = req.body; 
+  const { name, age, talk } = req.body;
 
   const talkers = await readTalkers();
 
   const talker = talkers.find((tal) => tal.id === +id);
-  
-  if (!talker) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+
+  if (!talker) {
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  }
 
   talker.name = name;
   talker.age = age;
@@ -123,6 +125,18 @@ router.put('/:id', tokenValid, nameValid, ageValid, talkValid, async (req, res) 
   await writeTalker(talkers);
 
   return res.status(200).json(talker);
+});
+
+router.delete('/:id', tokenValid, async (req, res) => {
+  const { id } = req.params;
+
+  const talkers = await readTalkers();
+
+  const newTalkers = talkers.filter((tal) => tal.id !== +id);
+
+  await writeTalker(newTalkers);
+
+  return res.status(204).json();
 });
 
 module.exports = router;
