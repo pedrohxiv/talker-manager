@@ -84,6 +84,16 @@ const talkValid = (req, res, next) => {
 
 router.get('/', async (_req, res) => res.status(200).json(await readTalkers()));
 
+router.get('/search', tokenValid, async (req, res) => {
+  const { q } = req.query;
+
+  const talkers = await readTalkers();
+
+  const talkersFiltered = talkers.filter((tal) => tal.name.includes(q));
+
+  return res.status(200).json(talkersFiltered);
+});
+
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
